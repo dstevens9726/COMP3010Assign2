@@ -19,6 +19,7 @@ Splunk installation and data preparation
 The first stage of installing Splunk was to prepare the environment for it. The environment  i chose was Ubuntu 24.04.3 running within a VMware virtual machine and then gave it the necessary resources to run Splunk.  
 
 For installing Splunk itself, the first step was to go to Splunk’s website and create an account, filling in all necessary fields. 
+![splunk signup](https://github.com/user-attachments/assets/9ad1b2cb-52a2-42c5-87bb-b849574946fe)
 
 After this, I navigated to the downloads page, and chose the Linux installs tag, and from there got copied the wget link for the .tgz  version. I chose this one because it includes all the necessary libraries and tools to be able to use it in the way I needed to. I then proceeded to copy that link into my terminal within Linux.
 
