@@ -13,3 +13,57 @@ BOTSv3 is a dataset produced by Splunk to be used with their SIEM software to tr
 SOC Roles and Incident Handling 
 
 An SOC makes use of different tiers to effectively make use of the time and different levels of skills of its members. The lowest level is tier 1, usually the most junior members of the team and they would be responsible for day-to-day monitoring of systems, triage, and basic investigation of alerts and, if necessary, escalation of these alerts. Tier 2 members would take charge of the in-depth investigation of an incident, similarly my own role in this BOTSv3 exercise. They would map out a timeline of events, identify root causes such as misconfiguration of permissions, intrusion points, and impact, attempt to contain damage and recommend remediation to higher tiers. Tier 3 would handle the most complex of tasks such as digital forensics, reverse engineering malware, and creating detection and prevention methods. Tier 4, usually the final tier, is responsible for the leadership of the team such as coordinating response to attacks, holistic improvement of practices, and communication with the executive team about any incidents. They would also approve or recommend actions to be taken to recover from the incident. 
+
+Splunk installation and data preparation 
+
+The first stage of installing Splunk was to prepare the environment for it. The environment  i chose was Ubuntu 24.04.3 running within a VMware virtual machine and then gave it the necessary resources to run Splunk.  
+
+For installing Splunk itself, the first step was to go to Splunk’s website and create an account, filling in all necessary fields. 
+
+After this, I navigated to the downloads page, and chose the Linux installs tag, and from there got copied the wget link for the .tgz  version. I chose this one because it includes all the necessary libraries and tools to be able to use it in the way I needed to. I then proceeded to copy that link into my terminal within Linux.
+
+This command downloads the file onto my machine. 
+
+ 
+
+The next step was to, firstly, make sure that the file was downloaded and I used the command “ls” to verify this. Having done this, the next step was to extract the file using the “sudo tar xvzf <filename> -C /opt” command. Sudo gives the user administrator privileges, needed to extract into “/opt”, tar is used to create or extract “.tar” archives. The line “xvzf” gives the commands on how to extract the file and tells the machine to decompress, extract, show the filename, from the filename in the argument. The “-C /opt” section tells the machine the to extract the file in the –C directory, in the folder /opt. It then asks for my password as it is needed to grant administrator privileges. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+The next step is to navigate into my desired  filepath  to start Splunk, and I do this by running the command “cd /opt/splunk/bin”. Now that I am there, I use the command “sudo  ./splunk start --accept-license" to start the program, and accept the license agreement. After this, i then have to input a username and password to use Splunk.  
+
+Following this, i am given the link for the splunk web interface. I simply open this link in the browser, and then the splunk web application opens and I am prompted to enter the username and password that I created earlier. 
+
+ 
+
+I then enter the username and password, click login and am then greeted with the Splunk homepage. 
+
+Now that the splunk installation process is complete, I now need to load Botsv3. First, I go to the Boss of the SOC GitHub and download the dataset 
+
+After this I then open my downloads folder and extract the file, making sure that all the components of the file are as expected.
+
+After this, I reopen my terminal into a new instance. I then do “sudo su” for root access, open the downloads folder with “cd Downloads” and do  “ls” to check what is there. Following this i run cp –r botsv3_data_set /opt/splunk/etc/apps”. This command recursively copies the dataset into the following filepath so that it can be used by Splunk. After this i  check that everything is in the files as it should be, i then navigate back through the filepath  to get to the bin section of splunk and run ./splunk  start. 
+
+I then open the link given and sign in same as earlier, and  i am greeted by the dataset in splunk after searching the botsv3 index. 
+
+ 
+
+ 
