@@ -75,5 +75,73 @@ After this, I reopen my terminal into a new instance. I then do “sudo su” fo
 I then open the link given and sign in same as earlier, and  i am greeted by the dataset in splunk after searching the botsv3 index. 
  <img width="2553" height="1432" alt="botsv3 splunk" src="https://github.com/user-attachments/assets/b762c6d8-7e7f-48e7-88dd-cc2ae4f0c91e" />
 
+ Guided Questions 
+
+Q1: List IAM users accessing the AWS service 
+
+A:  the users of the AWS service were bstoll,  btun, splunk_access, and web_admin. I found this out by querying the dataset with “index=botsv3 earliest=0 sourcetype=asw:cloudtrail  | stats count by userIdentity.userName. I then switched the presentation to verbose mode and clicked on the statistics tab, which gave me this: 
+
+In an SOC context, this is one of the first investigative actions that would be taken by a level 1 member of the team, after finding out what the issue was, in this case, a public s3 bucket on the AWS service. This allows for more focused investigation. 
+
+ 
+
+Q2: What field would you use to alert you that the service has been used without MFA? 
+
+A: the field that you should use is index=”botsv3 “earliest=o sourcetype=aws:cloudtrail userIdentity.sessionContext.attributes.mfaAuthenticated=*false*. This gives you all cloudtrail entries where a user's session has been started without MFA authentication. 
+
+In an SOC context, this would be used after finding out which users have used the service, to further narrow the scope of the investigation, and find out which user could have caused the problem    
+
+ 
+
+ 
+ 
+
+ 
+
+l 
+
+Q3: What is the model of processor used on the webserver? 
+
+A: the processor used is the Intel Xeon E5-2676. I found this by using the query index=botsv3 earliest=0 sourcetype=”hardware”. This query displays all the hardware information that has been gathered about connected devices. The only entries displayed were of the webserver. This could be useful in an SOC context because any information could be useful in an investigation. 
+
+Q4: What is the event ID of the API call that made the s3 bucket publicly accessible? 
+
+A: the event ID is ab45689d-69cd-41e7-8705-5350402cf7ac.  i  found this by using the query index=botsv3 earlies=0  sourcetype=aws:cloudtrail PutBucketAcl. This query searches for changes to the access control list (ACL) of the s3 bucket. I then looked through the permissions grantees until I found the grantee http[...]groups/global/Allusers (i.e. public).  This is useful in an SOC context because it essentially serves as the start of the timeline of the incident and allows you to identify the user who erroneously (or maliciously) assigned the permissions. 
+
+ 
+
+Q5: What is the username of the user who assigned the bucket to be publicly accessible? 
+
+A: Their username is bstoll. I found this by expanding some more of the information fields of the mistaken permissions grant, where it shows the details of the owner, in this case, bstoll. This is useful for an SOC because it will allow them to contact the person that made this mistake and give them extra training or take punitive action. If this came from an external actor, it would allow the team to take actions to remove their access to the systems. 
+
+Q6: what is the name of the s3 bucket that was made public? 
+
+A: the bucket that was made public was “frothlywebcode”.  This was found from the same entry as the previous 2 questions, but expanding a different field, namely requestParameters, which contains the bucketName field. This is useful to an SOC team because it allows them to triage the damage done by correcting the access policy, and investigating that bucket further to evaluate damage.  
+
+Q7: What is the name of the text file that was uploaded to the S3 bucket while it was publicly available? 
+
+The name of the file was OPEN_BUCKET_PLEASE_FIX.txt. I found this file by querying “index=botsv3 earliest=0 sourcetype=”aws:s3:accesslogs txt”. This showed   an entry for a HTTP GET request containing the .txt file on the S3 bucket. This is useful because it shows the SOC team what was uploaded to the bucket in this time and that   they need to remove and assess this. This would be done by a higher tier member of the team.  
+
+ 
+
+ 
+
+Q8: What is the FQDN of the endpoint that is running a different edition of Windows OS? 
+
+A:  I found that the FQDN was BSTOLL-L.froth.ly. I did this by first finding out what the different version of windows was by running the query “index=botsv3 earliest=0 sourcetype=winhostmon | stats count by OS”. This shows me the number of entries by different OS versions, of which the only different one was Windows 10 Enterprise 
+
+I then viewed other events by this device a found that the host was BSTOLL-L 
+
+I then used the query “index=botsv3 earliest=0 sourcetype=aws:cloudtrail | stats count by host” to find the host of the server, which turned out to be “splunk.froth.ly” but we can remove the “splunk”.  
+
+From here, we can infer that the FQDN of this webserver being run by BSTOLL-l was BSTOLL-l.froth.ly. 
+
+Conclusions 
+
+My findings from this investigation are that there were 4 IAM users within the dataset. API calls had been made without MFA, an S3 bucket was misconfigured, making it public by the user bstoll. There was also a .txt file uploaded to this bucket while it was public. It would also be useful for there to be an automatic alerts system that notifies the team when there is a possible error made, such as setting the S3 bucket to public. This would make response times to these events much quicker and limit any damage that could be done as a result. 
+
+The general lessons learned from this investigation were that MFA needs to be more rigorously enforced, as admin accounts granting permissions should always have this. Additionally, SIEM tools like this are an incredibly powerful and useful part of an SOC’s toolkit for investigation and monitoring networks for suspicious activity. I also learned several personal lessons from this investigation, such as how useful these tools are and what is within their scope. I have also made great strides in their actual use.    
+
+
 
  
