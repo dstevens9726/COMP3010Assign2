@@ -1,6 +1,7 @@
 # COMP3010Assign2
 Github repo for COMP3010 Assignment  2 containing  a report about splunk usage
 
+YouTube link: https://youtu.be/LD2ObrhfA5M 
 
 COMP 3010 Assignment  2 report 
 
