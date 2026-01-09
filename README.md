@@ -82,6 +82,7 @@ Q1: List IAM users accessing the AWS service
 A:  the users of the AWS service were bstoll,  btun, splunk_access, and web_admin. I found this out by querying the dataset with “index=botsv3 earliest=0 sourcetype=asw:cloudtrail  | stats count by userIdentity.userName. I then switched the presentation to verbose mode and clicked on the statistics tab, which gave me this: 
 
 In an SOC context, this is one of the first investigative actions that would be taken by a level 1 member of the team, after finding out what the issue was, in this case, a public s3 bucket on the AWS service. This allows for more focused investigation. 
+<img width="2552" height="1431" alt="q1" src="https://github.com/user-attachments/assets/d97cd4df-f21d-43a4-ba4c-2bf732660679" />
 
  
 
@@ -91,7 +92,8 @@ A: the field that you should use is index=”botsv3 “earliest=o sourcetype=aws
 
 In an SOC context, this would be used after finding out which users have used the service, to further narrow the scope of the investigation, and find out which user could have caused the problem    
 
- 
+ <img width="2553" height="1434" alt="q2" src="https://github.com/user-attachments/assets/bef426a4-74df-48c8-a440-5fb75d70feac" />
+
 
  
  
@@ -104,19 +106,27 @@ Q3: What is the model of processor used on the webserver?
 
 A: the processor used is the Intel Xeon E5-2676. I found this by using the query index=botsv3 earliest=0 sourcetype=”hardware”. This query displays all the hardware information that has been gathered about connected devices. The only entries displayed were of the webserver. This could be useful in an SOC context because any information could be useful in an investigation. 
 
+<img width="2553" height="1436" alt="q3" src="https://github.com/user-attachments/assets/10e2289d-1bc6-4993-860e-6497c75a693a" />
+
+
 Q4: What is the event ID of the API call that made the s3 bucket publicly accessible? 
 
 A: the event ID is ab45689d-69cd-41e7-8705-5350402cf7ac.  i  found this by using the query index=botsv3 earlies=0  sourcetype=aws:cloudtrail PutBucketAcl. This query searches for changes to the access control list (ACL) of the s3 bucket. I then looked through the permissions grantees until I found the grantee http[...]groups/global/Allusers (i.e. public).  This is useful in an SOC context because it essentially serves as the start of the timeline of the incident and allows you to identify the user who erroneously (or maliciously) assigned the permissions. 
 
- 
+<img width="2549" height="1432" alt="q4" src="https://github.com/user-attachments/assets/b181cec9-8c57-43e6-8e48-d7636132c517" />
+
 
 Q5: What is the username of the user who assigned the bucket to be publicly accessible? 
 
 A: Their username is bstoll. I found this by expanding some more of the information fields of the mistaken permissions grant, where it shows the details of the owner, in this case, bstoll. This is useful for an SOC because it will allow them to contact the person that made this mistake and give them extra training or take punitive action. If this came from an external actor, it would allow the team to take actions to remove their access to the systems. 
 
+<img width="2549" height="1434" alt="q5" src="https://github.com/user-attachments/assets/f634ae21-8d08-4192-a2fe-e759f7b616ff" />
+
 Q6: what is the name of the s3 bucket that was made public? 
 
 A: the bucket that was made public was “frothlywebcode”.  This was found from the same entry as the previous 2 questions, but expanding a different field, namely requestParameters, which contains the bucketName field. This is useful to an SOC team because it allows them to triage the damage done by correcting the access policy, and investigating that bucket further to evaluate damage.  
+
+<img width="2554" height="1434" alt="q6" src="https://github.com/user-attachments/assets/345e39cb-1344-4f49-bccd-9c0626b29f7d" />
 
 Q7: What is the name of the text file that was uploaded to the S3 bucket while it was publicly available? 
 
@@ -124,15 +134,21 @@ The name of the file was OPEN_BUCKET_PLEASE_FIX.txt. I found this file by queryi
 
  
 
- 
+ <img width="2556" height="1434" alt="q7" src="https://github.com/user-attachments/assets/629cf6a0-203b-4c1c-8e42-4bb18f46ecb8" />
+
 
 Q8: What is the FQDN of the endpoint that is running a different edition of Windows OS? 
 
 A:  I found that the FQDN was BSTOLL-L.froth.ly. I did this by first finding out what the different version of windows was by running the query “index=botsv3 earliest=0 sourcetype=winhostmon | stats count by OS”. This shows me the number of entries by different OS versions, of which the only different one was Windows 10 Enterprise 
 
+<img width="2547" height="1428" alt="q8-1" src="https://github.com/user-attachments/assets/6bdfad5f-b1f1-4baf-bac0-6336b0424c7e" />
+
 I then viewed other events by this device a found that the host was BSTOLL-L 
 
+<img width="2548" height="1433" alt="q8-2" src="https://github.com/user-attachments/assets/027c9c90-96d7-427a-b438-694ac63521ac" />
+
 I then used the query “index=botsv3 earliest=0 sourcetype=aws:cloudtrail | stats count by host” to find the host of the server, which turned out to be “splunk.froth.ly” but we can remove the “splunk”.  
+<img width="2553" height="1434" alt="q8-3" src="https://github.com/user-attachments/assets/aa497539-f9ab-43fb-b11f-28939bb4f0f0" />
 
 From here, we can infer that the FQDN of this webserver being run by BSTOLL-l was BSTOLL-l.froth.ly. 
 
